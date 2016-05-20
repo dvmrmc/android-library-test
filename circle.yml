@@ -7,7 +7,7 @@ test:
   post:
     - ./gradlew cobertura coveralls -p library
 
-deploy:
+deployment:
   staging:
     branch: development
     commands:
