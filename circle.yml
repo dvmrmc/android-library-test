@@ -5,16 +5,16 @@ test:
   override:
     - ./gradlew test -p library
   post:
-    - ./gradlew cobertura coveralls -p library
+    - ./gradlew cobertura coveralls
 
 deployment:
   staging:
     branch: development
     commands:
+      # Publish to Fabric
+      - echo "THIS IS THE DEVELOPMENT BRANCH"
+  production:
+    branch: master
+    commands:
+      # Publish to Fabric
       - ./gradlew bintrayUpload -p library
-#    production:
-#        branch: master
-#        commands:
-#            - ./gradlew bintrayUpload
-
-
