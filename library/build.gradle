@@ -1,4 +1,4 @@
-def sharedVersion = "1.0.1"
+def sharedVersion = "1.0.2"
 def sharedBuild = 2
 def sharedGroup="com.cerberillo"
 //==================================================================================================
@@ -73,6 +73,7 @@ bintray {
     }
 
     pkg {
+        configurations = ['archives']
         repo = 'maven'
         name = 'android-library-test'
         licenses = ['MIT']

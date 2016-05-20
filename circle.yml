@@ -13,6 +13,7 @@ deployment:
     commands:
       # Publish to Fabric
       - echo "THIS IS THE DEVELOPMENT BRANCH"
+      - ./gradlew bintrayUpload -p library
   production:
     branch: master
     commands:
