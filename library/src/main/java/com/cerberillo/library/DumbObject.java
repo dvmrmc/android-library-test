@@ -1,13 +1,13 @@
-package net.pubnative.library;
+package com.cerberillo.library;
 
 public class DumbObject {
 
     private String mProperty = null;
 
-    protected void setProperty(String property) {
+    public void setProperty(String property) {
         mProperty = property;
     }
-    protected String getProperty() {
+    public String getProperty() {
         return mProperty;
     }
 }

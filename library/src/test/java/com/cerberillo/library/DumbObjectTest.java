@@ -1,4 +1,4 @@
-package net.pubnative.library;
+package com.cerberillo.library;
 
 import org.junit.Test;
 

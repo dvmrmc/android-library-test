@@ -1,28 +1,35 @@
+def sharedVersion = "1.0.1"
+def sharedBuild = 2
+def sharedGroup="com.cerberillo"
+//==================================================================================================
+// PROJECT
+//==================================================================================================
 buildscript {
     repositories {
         jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.0'
+        // BINTRAY
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+        // COVERALLS
         classpath 'net.saliman:gradle-cobertura-plugin:2.3.1'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
     }
 }
-
 //==================================================================================================
 // ANDROID
 //==================================================================================================
 apply plugin: 'com.android.library'
 android {
     compileSdkVersion 23
-    buildToolsVersion "22.0.1"
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 10
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode sharedBuild
+        versionName sharedVersion
     }
     buildTypes {
         release {
@@ -31,13 +38,11 @@ android {
         }
     }
 }
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // JVM tests
     testCompile 'junit:junit:4.12'
 }
-
 //==================================================================================================
 // COVERALLS
 //==================================================================================================
@@ -49,13 +54,15 @@ cobertura.coverageFormats = ['html', 'xml']
 // BINTRAY
 //==================================================================================================
 apply plugin: 'com.jfrog.bintray'
+group = sharedGroup
+version = sharedVersion
 bintray {
 
     def bintrayUser = System.getenv("BINTRAY_USER");
     def bintrayApiKey = System.getenv("BINTRAY_API_KEY");
 
     File localPropertiesFile = project.rootProject.file('local.properties')
-    if(localPropertiesFile.canRead()) {
+    if (localPropertiesFile.canRead()) {
         Properties properties = new Properties()
         properties.load(localPropertiesFile.newDataInputStream())
         user = properties.getProperty('bintray.user')
@@ -71,7 +78,8 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/cerberillo/android-library-test.git'
         version {
-            name='1.0.0'
+            name = sharedVersion
+            vcsTag = sharedVersion
         }
     }
 }
