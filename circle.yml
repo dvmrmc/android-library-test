@@ -1,0 +1,19 @@
+machine:
+  timezone: Europe/Berlin
+
+test:
+  override:
+    - ./gradlew test -p library
+  post:
+    - ./gradlew cobertura coveralls -p library
+
+#deploy:
+#    production:
+#        branch: master
+#        commands:
+#            -
+#            - ./gradlew bintrayUpload
+#    staging:
+#        branch: development
+#        commands;
+#            - ./gradlew

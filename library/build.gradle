@@ -1,23 +1,19 @@
-apply plugin: 'com.android.library'
-apply plugin: 'com.jfrog.bintray'
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty('bintray.user')
-    key = properties.getProperty('bintray.api_key')
-    pkg {
-        repo = 'maven'
-        name = 'android-library-test'
-        licenses = ['MIT']
-        vcsUrl = 'https://github.com/cerberillo/android-library-test.git'
-        version {
-            name='1.0.0'
-        }
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+        classpath 'net.saliman:gradle-cobertura-plugin:2.3.1'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
     }
 }
 
+//==================================================================================================
+// ANDROID
+//==================================================================================================
+apply plugin: 'com.android.library'
 android {
     compileSdkVersion 23
     buildToolsVersion "22.0.1"
@@ -38,6 +34,33 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    // JVM tests
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.0.1'
+}
+
+//==================================================================================================
+// COVERALLS
+//==================================================================================================
+apply plugin: "net.saliman.cobertura"
+apply plugin: "com.github.kt3k.coveralls"
+cobertura.coverageFormats = ['html', 'xml']
+
+//==================================================================================================
+// BINTRAY
+//==================================================================================================
+apply plugin: 'com.jfrog.bintray'
+bintray {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    user = properties.getProperty('bintray.user')
+    key = properties.getProperty('bintray.api_key')
+    pkg {
+        repo = 'maven'
+        name = 'android-library-test'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/cerberillo/android-library-test.git'
+        version {
+            name='1.0.0'
+        }
+    }
 }
