@@ -50,10 +50,21 @@ cobertura.coverageFormats = ['html', 'xml']
 //==================================================================================================
 apply plugin: 'com.jfrog.bintray'
 bintray {
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    user = properties.getProperty('bintray.user')
-    key = properties.getProperty('bintray.api_key')
+
+    def bintrayUser = System.getenv("BINTRAY_USER");
+    def bintrayApiKey = System.getenv("BINTRAY_API_KEY");
+
+    File localPropertiesFile = project.rootProject.file('local.properties')
+    if(localPropertiesFile.canRead()) {
+        Properties properties = new Properties()
+        properties.load(localPropertiesFile.newDataInputStream())
+        user = properties.getProperty('bintray.user')
+        key = properties.getProperty('bintray.api_key')
+    } else {
+        user = bintrayUser
+        key = bintrayApiKey
+    }
+
     pkg {
         repo = 'maven'
         name = 'android-library-test'
