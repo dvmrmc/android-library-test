@@ -7,13 +7,14 @@ test:
   post:
     - ./gradlew cobertura coveralls -p library
 
-#deploy:
+deploy:
+  staging:
+    branch: development
+    commands:
+      - ./gradlew bintrayUpload -p library
 #    production:
 #        branch: master
 #        commands:
-#            -
 #            - ./gradlew bintrayUpload
-#    staging:
-#        branch: development
-#        commands;
-#            - ./gradlew
+
+
