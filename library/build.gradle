@@ -12,6 +12,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:2.1.0'
         // BINTRAY
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
         // COVERALLS
         classpath 'net.saliman:gradle-cobertura-plugin:2.3.1'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
@@ -54,8 +55,58 @@ cobertura.coverageFormats = ['html', 'xml']
 // BINTRAY
 //==================================================================================================
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
 group = sharedGroup
 version = sharedVersion
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+
+                name "android-library-test"
+                description "Tester android library with aiutomate deployment"
+
+                // Set your license
+                licenses {
+                    license {
+                        name "MIT"
+                        url "https://opensource.org/licenses/MIT"
+                    }
+                }
+                developers {
+                    developer {
+                        id "cerberillo"
+                        name "David Martin"
+                        email "david@martinmacias.com"
+                    }
+                }
+                scm {
+                    connection "https://github.com/cerberillo/android-library-test.git"
+                    developerConnection "https://github.com/cerberillo/android-library-test.git"
+                    url "https://github.com/cerberillo/android-library-test"
+                }
+            }
+        }
+    }
+}
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
 bintray {
 
     def bintrayUser = System.getenv("BINTRAY_USER");
