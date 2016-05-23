@@ -1,6 +1,7 @@
-def sharedVersion = "1.0.2"
+group = "com.cerberillo"
+version = "1.0.2"
+def sharedVersion = version
 def sharedBuild = 2
-def sharedGroup="com.cerberillo"
 //==================================================================================================
 // PROJECT
 //==================================================================================================
@@ -56,8 +57,6 @@ cobertura.coverageFormats = ['html', 'xml']
 //==================================================================================================
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
-group = sharedGroup
-version = sharedVersion
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
