@@ -1,3 +1,8 @@
+def sharedVersion = "1.0.0"
+def sharedBuild = 1
+//==================================================================================================
+// PROJECT
+//==================================================================================================
 buildscript {
     repositories {
         jcenter()
@@ -10,6 +15,7 @@ buildscript {
 }
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    maven { url 'https://dl.bintray.com/cerberillo/maven' }
 }
 //==================================================================================================
 // ANDROID
@@ -24,8 +30,8 @@ android {
         applicationId "com.cerberillo.library.demo"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode sharedBuild
+        versionName sharedVersion
     }
     buildTypes {
         release {
@@ -39,11 +45,12 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:design:23.3.0'
     compile project(':library')
-
-    testCompile 'junit:junit:4.12'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
+
+    testCompile 'junit:junit:4.12'
+
 }
 //==================================================================================================
 // FABRIC
@@ -51,23 +58,23 @@ dependencies {
 apply plugin: 'io.fabric'
 task fabric {
 
+    println ""
     println "======================================================================================"
     println "FABRIC START"
 
     File fabric = project.rootProject.file('library.demo/fabric.properties')
     if (fabric.canRead()) {
         fabric.delete()
-        println "Fabric file exists, removing it"
+        println " * Fabric file exists, removing it"
     }
     try {
-        println "Fabric start"
         fabric.createNewFile()
     } catch (IOException ioException) {
-        println "Fabric file error:" + ioException.toString()
+        println " * Fabric file Error:" + ioException.toString()
         println "======================================================================================"
         return
     }
-    println "Fabric file success"
+    println " * Fabric file created"
 
     def apiKey = System.getenv("FABRIC_API_KEY");
     def apiSecret = System.getenv("FABRIC_API_SECRET");
@@ -82,7 +89,7 @@ task fabric {
         }
 
         if(apiKey == null && apiSecret == null) {
-            println "Fabric properties not found, generating random ones"
+            println " * Fabric properties not found, generating random ones"
             def generator = { String alphabet, int n ->
                 new Random().with {
                     (1..n).collect { alphabet[nextInt(alphabet.length())] }.join()
@@ -91,23 +98,22 @@ task fabric {
             apiKey = generator((('a'..'z') + ('0'..'9')).join(), 40);
             apiSecret = generator((('a'..'z') + ('0'..'9')).join(), 64);
         } else {
-            println "Fabric properties found in local.properties file"
+            println " * Fabric properties found in local.properties file"
         }
     } else {
-        println "Fabric properties found in system enviroments"
+        println " * Fabric properties found in system enviroments"
     }
-
     println "------------------------------------------------"
-    println "CAPTURED FABRIC PROPERTIES"
-    print "apiKey = "
+    println " FABRIC PROPERTIES"
+    print " * API Key = "
     println apiKey
-    print "apiSecret = "
+    print " * API Secret = "
     println apiSecret
-
     fabric << "apiKey="
     fabric << apiKey
     fabric << "\n"
     fabric << "apiSecret="
     fabric << apiSecret
     println "======================================================================================"
+    println ""
 }
