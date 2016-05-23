@@ -1,16 +1,21 @@
 buildscript {
     repositories {
         jcenter()
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
-
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
 //==================================================================================================
 // ANDROID
 //==================================================================================================
 apply plugin: 'com.android.application'
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -36,4 +41,73 @@ dependencies {
     compile project(':library')
 
     testCompile 'junit:junit:4.12'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+        transitive = true;
+    }
+}
+//==================================================================================================
+// FABRIC
+//==================================================================================================
+apply plugin: 'io.fabric'
+task fabric {
+
+    println "======================================================================================"
+    println "FABRIC START"
+
+    File fabric = project.rootProject.file('library.demo/fabric.properties')
+    if (fabric.canRead()) {
+        fabric.delete()
+        println "Fabric file exists, removing it"
+    }
+    try {
+        println "Fabric start"
+        fabric.createNewFile()
+    } catch (IOException ioException) {
+        println "Fabric file error:" + ioException.toString()
+        println "======================================================================================"
+        return
+    }
+    println "Fabric file success"
+
+    def apiKey = System.getenv("FABRIC_API_KEY");
+    def apiSecret = System.getenv("FABRIC_API_SECRET");
+
+    if (apiKey == null && apiSecret == null) {
+        File local = project.rootProject.file('local.properties')
+        if (local.canRead()) {
+            Properties properties = new Properties()
+            properties.load(local.newDataInputStream())
+            apiKey = properties.getProperty('fabric.api_key')
+            apiSecret = properties.getProperty('fabric.api_secret')
+        }
+
+        if(apiKey == null && apiSecret == null) {
+            println "Fabric properties not found, generating random ones"
+            def generator = { String alphabet, int n ->
+                new Random().with {
+                    (1..n).collect { alphabet[nextInt(alphabet.length())] }.join()
+                }
+            }
+            apiKey = generator((('a'..'z') + ('0'..'9')).join(), 40);
+            apiSecret = generator((('a'..'z') + ('0'..'9')).join(), 64);
+        } else {
+            println "Fabric properties found in local.properties file"
+        }
+    } else {
+        println "Fabric properties found in system enviroments"
+    }
+
+    println "------------------------------------------------"
+    println "CAPTURED FABRIC PROPERTIES"
+    print "apiKey = "
+    println apiKey
+    print "apiSecret = "
+    println apiSecret
+
+    fabric << "apiKey="
+    fabric << apiKey
+    fabric << "\n"
+    fabric << "apiSecret="
+    fabric << apiSecret
+    println "======================================================================================"
 }

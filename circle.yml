@@ -2,6 +2,8 @@ machine:
   timezone: Europe/Berlin
 
 test:
+  pre:
+    - ./gradlew fabric -p library.demo
   override:
     - ./gradlew test -p library
   post:
@@ -12,10 +14,11 @@ deployment:
     branch: development
     commands:
       # Publish to Fabric
-      - echo "THIS IS THE DEVELOPMENT BRANCH"
-      - ./gradlew bintrayUpload -p library
+      - ./gradlew assembleDebug crashlyticsUploadDistributionDebug
   production:
     branch: master
     commands:
-      # Publish to Fabric
+      # Publish to FABRIC
+      - ./gradlew assembleDebug crashlyticsUploadDistributionDebug
+      # Publish to BINTRAY
       - ./gradlew bintrayUpload -p library
