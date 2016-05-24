@@ -1,32 +1,37 @@
-apply plugin: 'com.android.library'
-apply plugin: 'com.jfrog.bintray'
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty('bintray.user')
-    key = properties.getProperty('bintray.api_key')
-    pkg {
-        repo = 'maven'
-        name = 'android-library-test'
-        licenses = ['MIT']
-        vcsUrl = 'https://github.com/cerberillo/android-library-test.git'
-        version {
-            name='1.0.0'
-        }
+group = "com.cerberillo"
+version = "1.0.0"
+def sharedVersion = version
+def sharedBuild = 1
+//==================================================================================================
+// PROJECT
+//==================================================================================================
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.0'
+        // BINTRAY
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
+        // COVERALLS
+        classpath 'net.saliman:gradle-cobertura-plugin:2.3.1'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
     }
 }
-
+//==================================================================================================
+// ANDROID
+//==================================================================================================
+apply plugin: 'com.android.library'
 android {
     compileSdkVersion 23
-    buildToolsVersion "22.0.1"
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 10
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode sharedBuild
+        versionName sharedVersion
     }
     buildTypes {
         release {
@@ -35,9 +40,122 @@ android {
         }
     }
 }
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    // JVM tests
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.0.1'
+}
+//==================================================================================================
+// COVERALLS
+//==================================================================================================
+apply plugin: "net.saliman.cobertura"
+apply plugin: "com.github.kt3k.coveralls"
+cobertura.coverageFormats = ['html', 'xml']
+//==================================================================================================
+// BINTRAY
+//==================================================================================================
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+
+                name "android-library-test"
+                description "Tester android library with aiutomate deployment"
+
+                // Set your license
+                licenses {
+                    license {
+                        name "MIT"
+                        url "https://opensource.org/licenses/MIT"
+                    }
+                }
+                developers {
+                    developer {
+                        id "cerberillo"
+                        name "David Martin"
+                        email "david@martinmacias.com"
+                    }
+                }
+                scm {
+                    connection "https://github.com/cerberillo/android-library-test.git"
+                    developerConnection "https://github.com/cerberillo/android-library-test.git"
+                    url "https://github.com/cerberillo/android-library-test"
+                }
+            }
+        }
+    }
+}
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+bintray {
+    println ""
+    println "=================================================================================="
+    println " BINTRAY UPLOAD"
+
+    user = System.getenv("BINTRAY_USER");
+    key = System.getenv("BINTRAY_API_KEY");
+
+    if(user == null && key == null) {
+
+        File localPropertiesFile = project.rootProject.file('local.properties')
+        if (localPropertiesFile.canRead()) {
+            Properties properties = new Properties()
+            properties.load(localPropertiesFile.newDataInputStream())
+            user = properties.getProperty('bintray.user')
+            key = properties.getProperty('bintray.api_key')
+        }
+
+        if(user == null && key == null) {
+
+            println " * Bintray user and key not found, generating random ones"
+            def generator = { String alphabet, int n ->
+                new Random().with {
+                    (1..n).collect { alphabet[nextInt(alphabet.length())] }.join()
+                }
+            }
+            user = generator((('a'..'z') + ('0'..'9')).join(), 10);
+            key = generator((('a'..'z') + ('0'..'9')).join(), 40);
+        } else {
+            println " * Bintray user and key found in local.properties"
+        }
+    } else {
+        println " * Bintray user and key found in enviroment variables"
+    }
+
+    println "------------------------------------------------"
+    println "CAPTURED BINTRAY PROPERTIES"
+    print "User: "
+    println user
+    print "API key: "
+    println key
+
+    pkg {
+        configurations = ['archives']
+        repo = 'maven'
+        name = 'android-library-test'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/cerberillo/android-library-test.git'
+        version {
+            name = sharedVersion
+            vcsTag = sharedVersion
+        }
+    }
 }

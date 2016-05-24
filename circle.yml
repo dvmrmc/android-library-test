@@ -1,0 +1,24 @@
+machine:
+  timezone: Europe/Berlin
+
+test:
+  pre:
+    - ./gradlew fabric -p library.demo
+  override:
+    - ./gradlew test -p library
+  post:
+    - ./gradlew cobertura coveralls
+
+deployment:
+  staging:
+    branch: development
+    commands:
+      # Publish to Fabric
+      - ./gradlew assembleDebug crashlyticsUploadDistributionDebug
+  production:
+    branch: master
+    commands:
+      # Publish to FABRIC
+      - ./gradlew assembleDebug crashlyticsUploadDistributionDebug
+      # Publish to BINTRAY
+      - ./gradlew bintrayUpload -p library
