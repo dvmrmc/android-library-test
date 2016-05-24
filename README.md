@@ -1,6 +1,6 @@
 # android-library-test
 
-[![CircleCI](https://circleci.com/gh/cerberillo/android-library-test.svg?style=shield)](https://circleci.com/gh/cerberillo/android-library-test)[![Coverage Status](https://coveralls.io/repos/github/cerberillo/android-library-test/badge.svg?branch=development)](https://coveralls.io/github/cerberillo/android-library-test?branch=master)
+[![CircleCI](https://circleci.com/gh/cerberillo/android-library-test.svg?style=shield)](https://circleci.com/gh/cerberillo/android-library-test) [![Coverage Status](https://coveralls.io/repos/github/cerberillo/android-library-test/badge.svg?branch=development)](https://coveralls.io/github/cerberillo/android-library-test?branch=master)
 
 This is a tester project with working configuration for what I consider the minimum setup of a professional android project:
 
@@ -23,9 +23,30 @@ In this case, the configuration is:
 
 I left automate publishing deactivated because one never knows, so you need to manually publish builds, but It'll be pushing a button instead of uploading a build.
 
-#### BINTRAY CONFIGURATION
+#### CONFIGURATION
 
-In order to hide from public repositories sensible class like Bintray api key or Fabric api key or build secret, this project automatically reads from
+In order to hide from public repositories sensible class like Bintray api key or Fabric api key or build secret, this project automatically reads from system enviroment variables and local.properties file, in that priority order, and if not found, It will generate random keys so the project compilation doesn't fail, even when this keys will stop working.
+
+##### `enviroment variables`
+
+* BINTRAY_API_KEY
+* BINTRAY_USER
+* FABRIC_API_KEY
+* FABRIC_API_SECRET
+
+##### `local.properties`
+```
+#-------------------------------------------------------------------------------------------
+# BINTRAY
+#-------------------------------------------------------------------------------------------
+bintray.api_key=<YOUR_API_KEY>
+bintray.user=<YOUR_BINTRAY_USER>
+#-------------------------------------------------------------------------------------------
+# FABRIC
+#-------------------------------------------------------------------------------------------
+fabric.api_key=<YOUR_API_KEY>
+fabric.api_secret=<YOUR_API_SECRET>
+```
 
 #### MISCELANEA
 
