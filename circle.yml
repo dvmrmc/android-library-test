@@ -2,9 +2,6 @@ machine:
   timezone: Europe/Berlin
 
 test:
-  pre:
-    - ./gradlew projectInfo
-    - ./gradlew fabric # This will generate the fabric file necessary for compilation
   override:
     - ./gradlew clean test
   post:
@@ -15,11 +12,11 @@ deployment:
     branch: development
     commands:
       # Publish to Fabric
-      - ./gradlew assembleRelease crashlyticsUploadDistributionRelease
+      - ./gradlew assembleDebug crashlyticsUploadDistributionDebug
   production:
     branch: master
     commands:
       # Publish to FABRIC
-      - ./gradlew assembleRelease crashlyticsUploadDistributionRelease
+      - ./gradlew assembleDebug crashlyticsUploadDistributionDebug
       # Publish to BINTRAY
       - ./gradlew bintrayUpload
