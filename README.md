@@ -16,7 +16,7 @@ This is a tester project with working configuration for what I consider the mini
 
 In this case, the configuration is:
 
- 1. Continuous Integration with CircleCI
+ 1. Continuous Integration with CircleCI, using it's build number to compile
  2. Coverage status report using Coveralls.io that will validate every PR with coverage status report
  3. Automate deploy of library module to Bintray (for linking with jCenter)
  4. Automate deploy of library.demo project to Fabric
@@ -25,7 +25,9 @@ I left automate publishing deactivated because one never knows, so you need to m
 
 #### CONFIGURATION
 
-In order to hide from public repositories sensible class like Bintray api key or Fabric api key or build secret, this project automatically reads from system enviroment variables and local.properties file, in that priority order, and if not found, It will generate random keys so the project compilation doesn't fail, even when this keys will stop working.
+In order to hide from public repositories sensible class like Bintray api key or Fabric api key or build secret, this project automatically reads from system enviroment variables.
+
+If the those variables are not present, then some generic values are used.
 
 ##### `enviroment variables`
 
@@ -34,22 +36,6 @@ In order to hide from public repositories sensible class like Bintray api key or
 * FABRIC_API_KEY
 * FABRIC_API_SECRET
 
-##### `local.properties`
-```
-#-------------------------------------------------------------------------------------------
-# BINTRAY
-#-------------------------------------------------------------------------------------------
-bintray.api_key=<YOUR_API_KEY>
-bintray.user=<YOUR_BINTRAY_USER>
-#-------------------------------------------------------------------------------------------
-# FABRIC
-#-------------------------------------------------------------------------------------------
-fabric.api_key=<YOUR_API_KEY>
-fabric.api_secret=<YOUR_API_SECRET>
-```
-
 #### MISCELANEA
-
-Next step: auto increment build version, so it's not you're task
 
 Please, if you have any suggestion, improvement or bug to report use this repository to communicate and don't hesitate to send a pull request
