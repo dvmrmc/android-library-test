@@ -1,8 +1,8 @@
 //==================================================================================================
 // PROJECT
 //==================================================================================================
-version=project.hasProperty("version")?project.property("version"):"1.0.0"
-group=project.group
+version = project.hasProperty("version") ? project.property("version") : "1.0.0"
+group = project.group
 buildscript {
     repositories {
         jcenter()
@@ -13,15 +13,11 @@ buildscript {
         classpath 'io.fabric.tools:gradle:1.+'
     }
 }
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-    maven { url 'https://dl.bintray.com/cerberillo/maven' }
-}
+println "=========== ${project.group}:${project.name}:${version} - (${System.getenv("CIRCLE_BUILD_NUM")}) ==========="
 //==================================================================================================
 // ANDROID
 //==================================================================================================
 apply plugin: 'com.android.application'
-
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -29,9 +25,10 @@ android {
         applicationId "com.cerberillo.library.demo"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode System.getenv("CIRCLE_BUILD_NUM")?System.getenv("CIRCLE_BUILD_NUM").toInteger():1
+        versionCode System.getenv("CIRCLE_BUILD_NUM") ? System.getenv("CIRCLE_BUILD_NUM").toInteger() : 1
         versionName version
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -44,31 +41,26 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:design:23.3.0'
     compile project(':library')
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
-        transitive = true;
-    }
 
     testCompile 'junit:junit:4.12'
-}
-task projectInfo << {
-    println "\n Compiling: ${project.group}:${project.name}:${version} - (${System.getenv("CIRCLE_BUILD_NUM")})\n"
 }
 //==================================================================================================
 // FABRIC
 //==================================================================================================
-apply plugin: 'io.fabric'
-task fabric << {
-    File file = new File('library.demo/fabric.properties')
-    if (file.canRead()) {
-        file.delete()
-    }
-    try {
-        file.createNewFile()
-    } catch (IOException ioException) {
-        return
-    }
+if (System.getenv("CIRCLECI")) {
+    apply plugin: 'io.fabric'
 
-    // Add keys to fabric.properties file
-    file << "apiKey=${System.getenv("FABRIC_API_KEY")?:"key"}\n"
-    file << "apiSecret=${System.getenv("FABRIC_API_SECRET")?:"secret"}\n"
+    try {
+        File file = new File("${project.projectDir.absolutePath}/fabric.properties")
+        if (!file.canRead()) {
+            file.createNewFile()
+            file << "apiKey=${System.getenv("FABRIC_API_KEY")}\n"
+            file << "apiSecret=${System.getenv("FABRIC_API_SECRET")}\n"
+        }
+        println "======== FABRIC Success ========"
+    } catch (IOException ioException) {
+        println "======== FABRIC Error ========"
+        println "${ioException.toString()}"
+        println "------------------------------"
+    }
 }

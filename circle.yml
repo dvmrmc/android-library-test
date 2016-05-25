@@ -2,9 +2,6 @@ machine:
   timezone: Europe/Berlin
 
 test:
-  pre:
-    - ./gradlew projectInfo
-    - ./gradlew fabric # This will generate the fabric file necessary for compilation
   override:
     - ./gradlew clean test
   post:
