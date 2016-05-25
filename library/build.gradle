@@ -1,10 +1,8 @@
-group = "com.cerberillo"
-version = "1.0.0"
-def sharedVersion = version
-def sharedBuild = 1
 //==================================================================================================
 // PROJECT
 //==================================================================================================
+version=project.version?:"1.0.0"
+group=project.group
 buildscript {
     repositories {
         jcenter()
@@ -19,6 +17,9 @@ buildscript {
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
     }
 }
+task projectInfo << {
+    println "\n Compiling: ${project.group}:${project.name}:${version} - (${System.getenv("CIRCLE_BUILD_NUM")})\n"
+}
 //==================================================================================================
 // ANDROID
 //==================================================================================================
@@ -30,8 +31,8 @@ android {
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode sharedBuild
-        versionName sharedVersion
+        versionCode System.getenv("CIRCLE_BUILD_NUM")?System.getenv("CIRCLE_BUILD_NUM").toInteger():1
+        versionName version
     }
     buildTypes {
         release {
@@ -62,11 +63,8 @@ install {
         pom {
             project {
                 packaging 'aar'
-
-                name "android-library-test"
+                name project.name
                 description "Tester android library with aiutomate deployment"
-
-                // Set your license
                 licenses {
                     license {
                         name "MIT"
@@ -106,47 +104,8 @@ artifacts {
     archives sourcesJar
 }
 bintray {
-    println ""
-    println "=================================================================================="
-    println " BINTRAY UPLOAD"
-
-    user = System.getenv("BINTRAY_USER");
-    key = System.getenv("BINTRAY_API_KEY");
-
-    if(user == null && key == null) {
-
-        File localPropertiesFile = project.rootProject.file('local.properties')
-        if (localPropertiesFile.canRead()) {
-            Properties properties = new Properties()
-            properties.load(localPropertiesFile.newDataInputStream())
-            user = properties.getProperty('bintray.user')
-            key = properties.getProperty('bintray.api_key')
-        }
-
-        if(user == null && key == null) {
-
-            println " * Bintray user and key not found, generating random ones"
-            def generator = { String alphabet, int n ->
-                new Random().with {
-                    (1..n).collect { alphabet[nextInt(alphabet.length())] }.join()
-                }
-            }
-            user = generator((('a'..'z') + ('0'..'9')).join(), 10);
-            key = generator((('a'..'z') + ('0'..'9')).join(), 40);
-        } else {
-            println " * Bintray user and key found in local.properties"
-        }
-    } else {
-        println " * Bintray user and key found in enviroment variables"
-    }
-
-    println "------------------------------------------------"
-    println "CAPTURED BINTRAY PROPERTIES"
-    print "User: "
-    println user
-    print "API key: "
-    println key
-
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_API_KEY")
     pkg {
         configurations = ['archives']
         repo = 'maven'
@@ -154,8 +113,8 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/cerberillo/android-library-test.git'
         version {
-            name = sharedVersion
-            vcsTag = sharedVersion
+            name = project.version
+            vcsTag = project.version
         }
     }
 }

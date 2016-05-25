@@ -1,8 +1,8 @@
-def sharedVersion = "1.0.0"
-def sharedBuild = 1
 //==================================================================================================
 // PROJECT
 //==================================================================================================
+version=project.hasProperty("version")?project.property("version"):"1.0.0"
+group=project.group
 buildscript {
     repositories {
         jcenter()
@@ -25,13 +25,12 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
-
     defaultConfig {
         applicationId "com.cerberillo.library.demo"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode sharedBuild
-        versionName sharedVersion
+        versionCode System.getenv("CIRCLE_BUILD_NUM")?System.getenv("CIRCLE_BUILD_NUM").toInteger():1
+        versionName version
     }
     buildTypes {
         release {
@@ -50,70 +49,26 @@ dependencies {
     }
 
     testCompile 'junit:junit:4.12'
-
+}
+task projectInfo << {
+    println "\n Compiling: ${project.group}:${project.name}:${version} - (${System.getenv("CIRCLE_BUILD_NUM")})\n"
 }
 //==================================================================================================
 // FABRIC
 //==================================================================================================
 apply plugin: 'io.fabric'
-task fabric {
-
-    println ""
-    println "======================================================================================"
-    println "FABRIC START"
-
-    File fabric = project.rootProject.file('library.demo/fabric.properties')
-    if (fabric.canRead()) {
-        fabric.delete()
-        println " * Fabric file exists, removing it"
+task fabric << {
+    File file = new File('library.demo/fabric.properties')
+    if (file.canRead()) {
+        file.delete()
     }
     try {
-        fabric.createNewFile()
+        file.createNewFile()
     } catch (IOException ioException) {
-        println " * Fabric file Error:" + ioException.toString()
-        println "======================================================================================"
         return
     }
-    println " * Fabric file created"
 
-    def apiKey = System.getenv("FABRIC_API_KEY");
-    def apiSecret = System.getenv("FABRIC_API_SECRET");
-
-    if (apiKey == null && apiSecret == null) {
-        File local = project.rootProject.file('local.properties')
-        if (local.canRead()) {
-            Properties properties = new Properties()
-            properties.load(local.newDataInputStream())
-            apiKey = properties.getProperty('fabric.api_key')
-            apiSecret = properties.getProperty('fabric.api_secret')
-        }
-
-        if(apiKey == null && apiSecret == null) {
-            println " * Fabric properties not found, generating random ones"
-            def generator = { String alphabet, int n ->
-                new Random().with {
-                    (1..n).collect { alphabet[nextInt(alphabet.length())] }.join()
-                }
-            }
-            apiKey = generator((('a'..'z') + ('0'..'9')).join(), 40);
-            apiSecret = generator((('a'..'z') + ('0'..'9')).join(), 64);
-        } else {
-            println " * Fabric properties found in local.properties file"
-        }
-    } else {
-        println " * Fabric properties found in system enviroments"
-    }
-    println "------------------------------------------------"
-    println " FABRIC PROPERTIES"
-    print " * API Key = "
-    println apiKey
-    print " * API Secret = "
-    println apiSecret
-    fabric << "apiKey="
-    fabric << apiKey
-    fabric << "\n"
-    fabric << "apiSecret="
-    fabric << apiSecret
-    println "======================================================================================"
-    println ""
+    // Add keys to fabric.properties file
+    file << "apiKey=${System.getenv("FABRIC_API_KEY")?:"key"}\n"
+    file << "apiSecret=${System.getenv("FABRIC_API_SECRET")?:"secret"}\n"
 }

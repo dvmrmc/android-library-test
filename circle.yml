@@ -3,9 +3,10 @@ machine:
 
 test:
   pre:
-    - ./gradlew fabric -p library.demo
+    - ./gradlew projectInfo
+    - ./gradlew fabric # This will generate the fabric file necessary for compilation
   override:
-    - ./gradlew test -p library
+    - ./gradlew clean test
   post:
     - ./gradlew cobertura coveralls
 
@@ -21,4 +22,4 @@ deployment:
       # Publish to FABRIC
       - ./gradlew assembleDebug crashlyticsUploadDistributionDebug
       # Publish to BINTRAY
-      - ./gradlew bintrayUpload -p library
+      - ./gradlew bintrayUpload
