@@ -17,9 +17,7 @@ buildscript {
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
     }
 }
-task projectInfo << {
-    println "\n Compiling: ${project.group}:${project.name}:${version} - (${System.getenv("CIRCLE_BUILD_NUM")})\n"
-}
+println "=========== ${project.group}:${project.name}:${version} - (${System.getenv("CIRCLE_BUILD_NUM")}) ==========="
 //==================================================================================================
 // ANDROID
 //==================================================================================================

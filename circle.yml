@@ -15,11 +15,11 @@ deployment:
     branch: development
     commands:
       # Publish to Fabric
-      - ./gradlew assembleDebug crashlyticsUploadDistributionDebug
+      - ./gradlew assembleRelease crashlyticsUploadDistributionRelease
   production:
     branch: master
     commands:
       # Publish to FABRIC
-      - ./gradlew assembleDebug crashlyticsUploadDistributionDebug
+      - ./gradlew assembleRelease crashlyticsUploadDistributionRelease
       # Publish to BINTRAY
       - ./gradlew bintrayUpload
