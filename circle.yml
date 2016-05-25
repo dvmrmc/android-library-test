@@ -3,7 +3,7 @@ machine:
 
 test:
   pre:
-    - ./gradle projectInfo
+    - ./gradlew projectInfo
     - ./gradlew fabric # This will generate the fabric file necessary for compilation
   override:
     - ./gradlew clean test
