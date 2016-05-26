@@ -31,10 +31,10 @@ android {
 
     buildTypes {
         debug {
-            ext.betaDistributionGroupAliases="Developers"
+            ext.betaDistributionGroupAliases="developers"
         }
         release {
-            ext.betaDistributionGroupAliases="Developers"
+            ext.betaDistributionGroupAliases="developers"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
