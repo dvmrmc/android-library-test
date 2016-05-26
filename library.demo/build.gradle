@@ -30,7 +30,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            ext.betaDistributionGroupAliases="Developers"
+        }
         release {
+            ext.betaDistributionGroupAliases="Developers"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -49,7 +53,8 @@ dependencies {
 //==================================================================================================
 if (System.getenv("CIRCLECI")) {
     apply plugin: 'io.fabric'
-
+    println ""
+    println "======== FABRIC ========"
     try {
         File file = new File("${project.projectDir.absolutePath}/fabric.properties")
         if (!file.canRead()) {
@@ -57,10 +62,13 @@ if (System.getenv("CIRCLECI")) {
             file << "apiKey=${System.getenv("FABRIC_API_KEY")}\n"
             file << "apiSecret=${System.getenv("FABRIC_API_SECRET")}\n"
         }
-        println "======== FABRIC Success ========"
+        println " - Success"
+        println "========================"
+        println ""
     } catch (IOException ioException) {
-        println "======== FABRIC Error ========"
-        println "${ioException.toString()}"
-        println "------------------------------"
+        println " - Error: "
+        println " ${ioException.toString()}"
+        println "========================"
+        println ""
     }
 }
